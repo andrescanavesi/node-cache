@@ -38,3 +38,10 @@ module.exports.findById = async function(id) {
     //console.info(cacheUserById.getStats());
     return cacheUserById.getData(id);
 };
+
+/**
+ * @returns an array containing all caches stats
+ */
+module.exports.getCacheStats = function() {
+    return [cacheAllUsers.getStats(), cacheUserById.getStats()];
+};

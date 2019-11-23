@@ -1,15 +1,4 @@
 /**
- * A collection to keep our promises with the cached data.
- * key: a primitive or an dobject to identify our cached object
- * value: {created_at: <a date>, promise: <the promise>}
- */
-let promisesMap = new Map();
-/**
- * Millis of the lates cache clean up
- */
-let latestCleanUp = Date.now();
-
-/**
  * @param name a name to identify this cache, example "find all users cache"
  * @param duration cache duration in millis
  * @param size max quantity of elements to cache. After that the cache will remove the oldest element
@@ -21,6 +10,18 @@ module.exports.Cache = function(name, duration, size, func) {
     this.duration = duration;
     this.size = size;
     this.func = func;
+    this.cacheCalls = 0;
+    this.dataCalls = 0;
+    /**
+     * Millis of the lates cache clean up
+     */
+    this.latestCleanUp = Date.now();
+    /**
+     * A collection to keep our promises with the cached data.
+     * key: a primitive or an dobject to identify our cached object
+     * value: {created_at: <a date>, promise: <the promise>}
+     */
+    this.promisesMap = new Map();
 };
 
 /**
@@ -28,9 +29,20 @@ module.exports.Cache = function(name, duration, size, func) {
  */
 this.Cache.prototype.getStats = function() {
     const stats = {
-        cache_name: this.name,
-        size: promisesMap.size,
+        name: this.name,
+        max_size: this.size,
+        current_size: this.promisesMap.size,
+        duration_in_seconds: this.duration / 1000,
+        cache_calls: this.cacheCalls,
+        data_calls: this.dataCalls,
+        total_calls: this.cacheCalls + this.dataCalls,
     };
+    let hitsPercentage = 0;
+    if (stats.total_calls > 0) {
+        hitsPercentage = Math.round((this.cacheCalls * 100) / stats.total_calls);
+    }
+    stats.hits_percentage = hitsPercentage;
+
     return stats;
 };
 
@@ -38,18 +50,21 @@ this.Cache.prototype.getStats = function() {
  * @param {*} key
  */
 this.Cache.prototype.getData = function(key) {
-    if (promisesMap.has(key)) {
+    if (this.promisesMap.has(key)) {
         console.info(`[${this.name}] Returning cache for the key: ${key}`);
         /*
          * We have to see if our cached objects did not expire.
          * If expired we have to get freshed data
          */
         if (this.isObjectExpired(key)) {
+            this.dataCalls++;
             return this.getFreshedData(key);
         } else {
-            return promisesMap.get(key).promise;
+            this.cacheCalls++;
+            return this.promisesMap.get(key).promise;
         }
     } else {
+        this.dataCalls++;
         return this.getFreshedData(key);
     }
 };
@@ -74,7 +89,7 @@ this.Cache.prototype.getFreshedData = function(key) {
     };
 
     this.cleanUp();
-    promisesMap.set(key, cacheElem);
+    this.promisesMap.set(key, cacheElem);
     return promise;
 };
 
@@ -82,10 +97,10 @@ this.Cache.prototype.getFreshedData = function(key) {
  * @param {*} key
  */
 this.Cache.prototype.isObjectExpired = function(key) {
-    if (!promisesMap.has(key)) {
+    if (!this.promisesMap.has(key)) {
         return false;
     } else {
-        const object = promisesMap.get(key);
+        const object = this.promisesMap.get(key);
         const diff = Date.now() - object.created_at;
         return diff > this.duration;
     }
@@ -97,26 +112,25 @@ this.Cache.prototype.cleanUp = async function() {
     /**
      * We have to see if we have enough space
      */
-    if (promisesMap.size >= this.size || Date.now() - latestCleanUp > this.duration) {
+    if (this.promisesMap.size >= this.size || Date.now() - this.latestCleanUp > this.duration) {
         let oldest = Date.now();
         let oldestKey = null;
         //iterate the map to remove the expired objects and calculate the oldest objects to
         //be removed in case the cache is full after removing expired objects
-        for (let [key, value] of promisesMap) {
+        for (let [key, value] of this.promisesMap) {
             if (this.isObjectExpired(key)) {
                 console.info(`the key ${key} is expired and will be deleted form the cache`);
-                promisesMap.delete(key);
+                this.promisesMap.delete(key);
             } else if (value.created_at < oldest) {
                 oldest = value.created_at;
                 oldestKey = key;
             }
-            console.log(`m[${key}] = ${value.created_at}`);
         }
 
         //if after this clean up our cache is still full we delete the oldest
-        if (promisesMap.size >= this.size && oldestKey !== null) {
+        if (this.promisesMap.size >= this.size && oldestKey !== null) {
             console.info(`the oldest element with the key ${oldestKey} in the cache was deleted`);
-            promisesMap.delete(oldestKey);
+            this.promisesMap.delete(oldestKey);
         }
     } else {
         console.info("[cleanUp] cache will not be cleaned up this time");
@@ -126,6 +140,9 @@ this.Cache.prototype.cleanUp = async function() {
 /**
  *
  */
-this.Cache.prototype.empty = function() {
+this.Cache.prototype.reset = function() {
     this.promisesMap = new Map();
+    this.latestCleanUp = Date.now();
+    this.cacheCalls = 0;
+    this.dataCalls = 0;
 };
