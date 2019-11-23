@@ -17,10 +17,16 @@ const cacheAllUsers = new Cache("all users", 1000 * 5, 20, key => {
     //throw new Error("im an error");
 });
 
-const cacheUserById = new Cache("user by id", 1000 * 5, 30, key => {
-    //TODO iterate the colleciton and return the user by the key
-    return "Im cache user by id func with the key: " + key;
-    //throw new Error("im an error");
+const cacheUserById = new Cache("user by id", 1000 * 5, 30, userId => {
+    let i = 0;
+    do {
+        if (allUsers[i].id === userId) {
+            return allUsers[i];
+        }
+        i++;
+    } while (i < allUsers.length);
+
+    return null;
 });
 
 /**
@@ -42,6 +48,6 @@ module.exports.findById = async function(id) {
 /**
  * @returns an array containing all caches stats
  */
-module.exports.getCacheStats = function() {
-    return [cacheAllUsers.getStats(), cacheUserById.getStats()];
+module.exports.getCacheStats = function(showContent) {
+    return [cacheUserById.getStats(showContent), cacheAllUsers.getStats(showContent)];
 };

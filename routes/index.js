@@ -8,14 +8,16 @@ router.get("/", async function(req, res, next) {
         // await daoUsers.findAll();
         // await daoUsers.findAll();
         // await daoUsers.findAll();
-        await daoUsers.findById(33);
-        await daoUsers.findById(25);
-        await daoUsers.findById(33);
-        await daoUsers.findById(25);
-        await daoUsers.findById(33);
-        await daoUsers.findById(25);
+        await daoUsers.findById(1);
+        await daoUsers.findById(2);
+        await daoUsers.findById(1);
+        await daoUsers.findById(2);
+        await daoUsers.findById(2);
+        await daoUsers.findById(444);
+        await daoUsers.findById(444);
+        await daoUsers.findById(444);
         //const allUsers = await daoUsers.findAll();
-        const cacheStats = daoUsers.getCacheStats();
+        const cacheStats = daoUsers.getCacheStats(true);
         res.json(cacheStats);
     } catch (error) {
         next(error);

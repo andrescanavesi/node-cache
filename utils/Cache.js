@@ -27,7 +27,7 @@ module.exports.Cache = function(name, duration, size, func) {
 /**
  * @returns
  */
-this.Cache.prototype.getStats = function() {
+this.Cache.prototype.getStats = function(showContent) {
     const stats = {
         name: this.name,
         max_size: this.size,
@@ -36,13 +36,19 @@ this.Cache.prototype.getStats = function() {
         cache_calls: this.cacheCalls,
         data_calls: this.dataCalls,
         total_calls: this.cacheCalls + this.dataCalls,
+        latest_clean_up: new Date(this.latestCleanUp),
     };
     let hitsPercentage = 0;
     if (stats.total_calls > 0) {
         hitsPercentage = Math.round((this.cacheCalls * 100) / stats.total_calls);
     }
     stats.hits_percentage = hitsPercentage;
-
+    if (showContent) {
+        stats.content = [];
+        for (let [key, value] of this.promisesMap) {
+            stats.content.push({key: key, created_at: new Date(value.created_at)});
+        }
+    }
     return stats;
 };
 
