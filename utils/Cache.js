@@ -5,7 +5,34 @@
  * @param func the function to execute (our heavy operation)
  */
 module.exports.Cache = function(name, duration, size, func) {
-    //TODO validate parameters
+    if (!name) {
+        throw Error("name cannot be empty");
+    }
+    if (!duration) {
+        throw Error("duration cannot be empty");
+    }
+    if (isNaN(duration)) {
+        throw Error("duration is not a number");
+    }
+    if (duration < 0) {
+        throw Error("duration must be positive");
+    }
+    if (!size) {
+        throw Error("size cannot be empty");
+    }
+    if (isNaN(size)) {
+        throw Error("size is not a number");
+    }
+    if (size < 0) {
+        throw Error("size must be positive");
+    }
+    if (!func) {
+        throw Error("func cannot be empty");
+    }
+    if (typeof func !== "function") {
+        throw Error("func must be a function");
+    }
+
     this.name = name;
     this.duration = duration;
     this.size = size;
