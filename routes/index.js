@@ -5,6 +5,7 @@ const daoUsers = require("../daos/dao_users");
 
 router.get("/", async function(req, res, next) {
     try {
+        daoUsers.seed();
         // await daoUsers.findAll();
         // await daoUsers.findAll();
         // await daoUsers.findAll();

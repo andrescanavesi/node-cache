@@ -5,12 +5,11 @@ const allUsers = [];
 /**
  * Creates some users for our allUsers collection
  */
-function seed() {
+module.exports.seed = function() {
     for (let i = 0; i < 10; i++) {
         allUsers.push({id: i, name: "user" + i});
     }
-}
-seed();
+};
 
 const cacheAllUsers = new Cache("all users", 1000 * 5, 20, key => {
     return "Im cache all users func with the key: " + key;
