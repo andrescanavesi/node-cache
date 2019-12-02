@@ -1,26 +1,15 @@
-const app = require("../app");
 const chai = require("chai");
-const chaiHttp = require("chai-http");
 const assert = chai.assert;
-const expect = chai.expect;
 var randomstring = require("randomstring");
 const {Cache} = require("../utils/Cache");
-const daoUsers = require("../daos/dao_users");
-
-// Configure chai
-chai.use(chaiHttp);
-chai.should();
-
-function assertNotError(err, res) {
-    if (err) {
-        log.error(err.message);
-        assert.fail(err);
-    }
-}
 
 describe("Test Cache", function() {
     this.timeout(10 * 1000); //10 seconds
 
+    /**
+     * Dummy function to use in our cache when we eant to test others parts of our cache class
+     * so no matter which function we use
+     */
     const dummyFunc = key => {
         return "test";
     };
@@ -71,8 +60,6 @@ describe("Test Cache", function() {
             const stats = cache.getStats();
             assert.isNotNull(stats);
             assert.equal(stats.name, cacheName);
-
-            //TODO
         });
     });
 
@@ -82,11 +69,8 @@ describe("Test Cache", function() {
             const cache = new Cache(cacheName, 1, 1, dummyFunc);
             let data = await cache.getData(1);
             assert.isNotNull(data);
-
             data = cache.getData(1);
             assert.isNotNull(data);
-
-            //TODO
         });
     });
 
@@ -95,8 +79,6 @@ describe("Test Cache", function() {
             const cacheName = randomstring.generate(8);
             const cache = new Cache(cacheName, 1, 1, dummyFunc);
             await cache.cleanUp();
-
-            //TODO
         });
     });
 
@@ -110,7 +92,6 @@ describe("Test Cache", function() {
             await cache.isObjectExpired(null);
             await cache.isObjectExpired("");
             await cache.isObjectExpired(" ");
-            //TODO
         });
     });
 
@@ -119,8 +100,6 @@ describe("Test Cache", function() {
             const cacheName = randomstring.generate(8);
             const cache = new Cache(cacheName, 1, 1, dummyFunc);
             await cache.getFreshedData(1);
-
-            //TODO
         });
     });
 
@@ -129,8 +108,6 @@ describe("Test Cache", function() {
             const cacheName = randomstring.generate(8);
             const cache = new Cache(cacheName, 1, 1, dummyFunc);
             await cache.reset();
-
-            //TODO
         });
     });
 });

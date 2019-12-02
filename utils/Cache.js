@@ -171,7 +171,8 @@ this.Cache.prototype.cleanUp = async function() {
 };
 
 /**
- *
+ * Resets all the cache.
+ * Useful when we update several values in our data source
  */
 this.Cache.prototype.reset = function() {
     this.promisesMap = new Map();

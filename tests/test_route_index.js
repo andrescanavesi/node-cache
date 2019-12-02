@@ -3,9 +3,6 @@ const chai = require("chai");
 const chaiHttp = require("chai-http");
 const assert = chai.assert;
 const expect = chai.expect;
-var randomstring = require("randomstring");
-const {Cache} = require("../utils/Cache");
-const daoUsers = require("../daos/dao_users");
 
 // Configure chai
 chai.use(chaiHttp);
@@ -30,6 +27,4 @@ describe("Test index route", function() {
                 done();
             });
     });
-
-    //TODO add more scenarios
 });
