@@ -13,7 +13,6 @@ module.exports.seed = function() {
 
 const cacheAllUsers = new Cache("all users", 1000 * 5, 20, key => {
     return "Im cache all users func with the key: " + key;
-    //throw new Error("im an error");
 });
 
 const cacheUserById = new Cache("user by id", 1000 * 5, 30, userId => {
@@ -40,7 +39,6 @@ module.exports.findAll = async function() {
  * @param {number} id
  */
 module.exports.findById = async function(id) {
-    //console.info(cacheUserById.getStats());
     return cacheUserById.getData(id);
 };
 

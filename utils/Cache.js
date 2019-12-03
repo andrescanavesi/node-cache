@@ -45,7 +45,7 @@ module.exports.Cache = function(name, duration, size, func) {
     this.latestCleanUp = Date.now();
     /**
      * A collection to keep our promises with the cached data.
-     * key: a primitive or an dobject to identify our cached object
+     * key: a primitive or an object to identify our cached object
      * value: {created_at: <a date>, promise: <the promise>}
      */
     this.promisesMap = new Map();
